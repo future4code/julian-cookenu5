@@ -5,11 +5,11 @@ interface AuthenticationData{
 }
 
 export class Authenticator {
-    private static EXPIRES_IN = ""; // inserir tempo de expiração
+    private static EXPIRES_IN = "1min"; 
     public generateToken(input: AuthenticationData): string{
         const token = jwt.sign(
             {id: input.id},
-            process.env.JWT_KEY as string,  // JWT_KEY ainda não está conf no .env
+            process.env.JWT_KEY as string,  
             {expiresIn: Authenticator.EXPIRES_IN}
         )
         return token
