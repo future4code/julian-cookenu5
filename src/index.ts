@@ -9,6 +9,7 @@ import HashManager from "./service/HashManager";
 dotenv.config();
 
 const app = express();
+
 app.use(express.json());
 
 app.post('/signup', async (req: express.Request, res: express.Response) => {
@@ -46,9 +47,7 @@ app.post('/signup', async (req: express.Request, res: express.Response) => {
         const token = authenticator.generateToken({
             id
         })
-        res.status(200).send({
-            token
-        })
+        res.status(200).send({token})
         
     } catch (error) {
         res.status(400).send({
@@ -57,12 +56,47 @@ app.post('/signup', async (req: express.Request, res: express.Response) => {
     }  
 })
 
+
+app.post("/login", async (req: express.Request, res: express.Response) => {
+    try{
+      const userData = 
+      {
+        email: req.body.email,
+        password: req.body.password
+      }
+
+      const userDatabase = new UserDatabase();
+      const user = await userDatabase.getByEmail(userData.email); 
+      
+      const hashManager = new HashManager()
+      const comparePassword = await hashManager.compare(userData.password, user.password)
+
+      if(user.email !== userData.email){
+        throw new Error("E-mail inválido.");
+      }
+
+      if(comparePassword === false){
+        throw new Error("Senha inválida.");
+      }
+
+      const authenticator = new Authenticator();
+      const token = authenticator.generateToken({id: user.id});
+  
+      res.status(200).send({token});
+  
+    }catch(err){
+      res.status(400).send({error: err.message});
+    }
+  
+  });
+
 app.get("/user/profile", async (req: Request, res: Response) => {
     try {
       const token = req.headers.authorization as string;
   
       const authenticator = new Authenticator();
       const authenticationData = authenticator.getData(token);
+
 
       const userDb = new UserDatabase();
       const user = await userDb.getUserById(authenticationData.id);
