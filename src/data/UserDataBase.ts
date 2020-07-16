@@ -1,11 +1,12 @@
-import knex from "knex";
 import { BaseDatabase } from "./BaseDatabase";
+
 
 export class UserDatabase extends BaseDatabase {
      
-    private static TABLE_NAME = ""; //inserir o nome da tabela de usuários
+    private static TABLE_NAME = "Cookenu_User"; 
   
-    async createUser(      //função de criar um novo usuário
+    async createUser(
+      id: string,      
       name: string,
       email: string,
       password: string
@@ -13,6 +14,7 @@ export class UserDatabase extends BaseDatabase {
       try {
           await this.getConnection()
             .insert({
+              id,
               name,
               email,
               password, 
@@ -24,7 +26,27 @@ export class UserDatabase extends BaseDatabase {
       } catch (error) {
         throw new Error(error.sqlMessage || error.message)
       }
-    
     }
+
+  //   async getUserByEmail(email: string): Promise<any> {
+
+  //     try {
+  //         const result =
+  //         await this.getConnection()
+  //         .select("*")
+  //         .from(UserDatabase.TABLE_NAME)
+  //         .where({email});
+
+  //         return result[0];
+
+  //     } catch (err) {
+  //         throw new Error(err.sqlMessage || err.message)
+  //     }
+  // }
+
   }
+
+
+
+  
   
