@@ -9,6 +9,7 @@ import HashManager from "./service/HashManager";
 dotenv.config();
 
 const app = express();
+
 app.use(express.json());
 
 app.post('/signup', async (req: express.Request, res: express.Response) => {
@@ -46,9 +47,7 @@ app.post('/signup', async (req: express.Request, res: express.Response) => {
         const token = authenticator.generateToken({
             id
         })
-        res.status(200).send({
-            token
-        })
+        res.status(200).send({token})
         
     } catch (error) {
         res.status(400).send({
@@ -57,33 +56,38 @@ app.post('/signup', async (req: express.Request, res: express.Response) => {
     }  
 })
 
-// app.post("/login", async (req: Request, res: Response)=>{
+app.post("/login", async (req: express.Request, res: express.Response) => {
+    try{
+      const userData = 
+      {
+        email: req.body.email,
+        password: req.body.password
+      }
 
-//     try{
-//       const userData = 
-//       {
-//         email: req.body.email,
-//         password: req.body.password
-//       }
-  
-//       const userDatabase = new UserDatabase();
-//       const user = await userDatabase.getUserByEmail(userData.email);
-  
-//       if(user.password !== userData.password){
-//         throw new Error("Invalid password");
-//       }
-  
-//       const authenticator = new Authenticator();
-//       const token = authenticator.generateToken({id: user.id});
-  
-//       res.status(200).send({token});
-  
-//     }catch(err){
-//       res.status(400).send({error: err.message});
-//     }
-  
-  //});
+      const userDatabase = new UserDatabase();
+      const user = await userDatabase.getByEmail(userData.email); 
+      
+      const hashManager = new HashManager()
+      const comparePassword = await hashManager.compare(userData.password, user.password)
 
+      if(user.email !== userData.email){
+        throw new Error("E-mail inválido.");
+      }
+
+      if(comparePassword === false){
+        throw new Error("Senha inválida.");
+      }
+
+      const authenticator = new Authenticator();
+      const token = authenticator.generateToken({id: user.id});
+  
+      res.status(200).send({token});
+  
+    }catch(err){
+      res.status(400).send({error: err.message});
+    }
+  
+  });
 
 
 const server = app.listen(process.env.PORT || 3003, () => {   
