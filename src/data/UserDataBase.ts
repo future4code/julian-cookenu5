@@ -28,21 +28,13 @@ export class UserDatabase extends BaseDatabase {
       }
     }
 
-  //   async getUserByEmail(email: string): Promise<any> {
-
-  //     try {
-  //         const result =
-  //         await this.getConnection()
-  //         .select("*")
-  //         .from(UserDatabase.TABLE_NAME)
-  //         .where({email});
-
-  //         return result[0];
-
-  //     } catch (err) {
-  //         throw new Error(err.sqlMessage || err.message)
-  //     }
-  // }
+    public async getUserById(id: string): Promise<any> {
+      const result = await this.getConnection()
+        .select("*")
+        .from(UserDatabase.TABLE_NAME)
+        .where({ id });
+      return result[0];
+    }
 
   }
 
