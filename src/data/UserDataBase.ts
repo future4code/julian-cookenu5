@@ -27,6 +27,7 @@ export class UserDatabase extends BaseDatabase {
       }
     }
 
+
     async getByEmail(email: string): Promise<any> {
 
       try {
@@ -41,6 +42,14 @@ export class UserDatabase extends BaseDatabase {
       } catch (err) {
           throw new Error(err.sqlMessage || err.message)
       }
+
+    public async getUserById(id: string): Promise<any> {
+      const result = await this.getConnection()
+        .select("*")
+        .from(UserDatabase.TABLE_NAME)
+        .where({ id });
+      return result[0];
+
     }
 
 }
