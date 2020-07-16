@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc-node ./src/index.ts"
+    "start": "ts-node ./src/index.ts"
   },
   "author": "Carolina Muniz e Melissa Tammy",
   "license": "ISC",
@@ -26,5 +26,3 @@
     "uuid": "^8.2.0"
   }
 }
-
-
