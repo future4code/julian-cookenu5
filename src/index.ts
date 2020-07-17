@@ -129,10 +129,10 @@ app.post('/recipe', async (req: express.Request, res: express.Response) => {
 
         }
 
-        const RecipeData = {
-            title: req.body.title,
-            description: req.body.description,
-        }
+            const RecipeData = {
+                title: req.body.title,
+                description: req.body.description,
+            }
 
         const idGenerator = new IdGenerator();
         const id = idGenerator.generate();
@@ -153,6 +153,7 @@ app.post('/recipe', async (req: express.Request, res: express.Response) => {
     }
 })
 
+
 app.post('/user/follow/:id', async (req: express.Request, res: express.Response) => {
     try {
         const token= req.headers.authorization as string;
@@ -171,6 +172,29 @@ app.post('/user/follow/:id', async (req: express.Request, res: express.Response)
         })
     }
 })
+
+    app.get("/recipe/:id", async (req: Request, res: Response) => {
+        try {
+            const token = req.headers.authorization as string;
+            const authenticator = new Authenticator();
+            const authenticationData = authenticator.getData(token);
+
+            const recipeDb = new RecipeDatabase();
+            const recipe = await recipeDb.getRecipeById(req.params.id);
+
+            res.status(200).send({
+                id: recipe.id,
+                title: recipe.title,
+                description: recipe.description,
+                createdAt: recipe.createdAt
+            });
+        } catch (err) {
+            res.status(400).send({
+                message: err.message,
+            });
+        }
+    });
+
 
 const server = app.listen(process.env.PORT || 3003, () => {
     if (server) {
