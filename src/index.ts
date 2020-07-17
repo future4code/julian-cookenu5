@@ -5,6 +5,7 @@ import { IdGenerator } from "./IdGenetator";
 import { UserDatabase } from "./data/UserDataBase";
 import { RecipeDatabase } from "./data/RecipeDatabase";
 import { Authenticator } from "./service/Authenticator";
+import {FollowDatabase}from "./data/FollowDatabase"
 import HashManager from "./service/HashManager";
 
 dotenv.config();
@@ -160,8 +161,8 @@ app.post('/user/follow/:id', async (req: express.Request, res: express.Response)
         const authenticator = new Authenticator();
         const authenticationData = authenticator.getData(token);
         
-        const userDataBase = new UserDatabase();
-        const follow = await userDataBase.follow(authenticationData.id, req.params.id);
+        const followDatabase = new FollowDatabase();
+        const follow = await followDatabase.follow(authenticationData.id, req.params.id);
 
         res.status(200).send("Usuário seguido com sucesso")
     
@@ -183,8 +184,8 @@ app.post('/user/unfollow/:id', async (req: express.Request, res: express.Respons
             throw new Error("Usuário inválido / Campo vazio.")
         }
                
-        const userDataBase = new UserDatabase();
-        userDataBase.unfollow(authenticationData.id, req.params.id);
+        const followDataBase = new FollowDatabase();
+        followDataBase.unfollow(authenticationData.id, req.params.id);
 
         res.status(200).send("Você deixou de seguir o perfil")
     
@@ -246,8 +247,3 @@ const server = app.listen(process.env.PORT || 3003, () => {
         console.error(`Failure upon starting server.`);
     }
   });
-
-
-
-
-

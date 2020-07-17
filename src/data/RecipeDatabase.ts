@@ -1,5 +1,4 @@
 import { BaseDatabase } from "./BaseDatabase";
-import moment from 'moment'
 
 export class RecipeDatabase extends BaseDatabase {
      
@@ -46,5 +45,4 @@ export class RecipeDatabase extends BaseDatabase {
         `)
       return result[0]
     }
-
 }
