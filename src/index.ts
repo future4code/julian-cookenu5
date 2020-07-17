@@ -41,7 +41,7 @@ app.post('/signup', async (req: express.Request, res: express.Response) => {
         const id = idGenerator.generate();
 
         const userDB = new UserDatabase();
-        const user = await userDB.createUser(id, userData.name, userData.email, cipherText)
+        const user = await userDB.create(id, userData.name, userData.email, cipherText)
 
         const authenticator = new Authenticator();
         const token = authenticator.generateToken({
@@ -100,7 +100,7 @@ app.get("/user/profile", async (req: Request, res: Response) => {
 
 
         const userDb = new UserDatabase();
-        const user = await userDb.getUserById(authenticationData.id);
+        const user = await userDb.getById(authenticationData.id);
 
         res.status(200).send({
             id: user.id,
@@ -160,9 +160,13 @@ app.post('/user/follow/:id', async (req: express.Request, res: express.Response)
 
         const authenticator = new Authenticator();
         const authenticationData = authenticator.getData(token);
+
+        if (!req.params.id || req.params.id === "") {
+            throw new Error("Usuário inválido / Campo vazio.")
+        }
         
         const userDataBase = new UserDatabase();
-        const follow = await userDataBase.insertFollowedUserId(authenticationData.id, req.params.id);
+        await userDataBase.follow(authenticationData.id, req.params.id);
 
         res.status(200).send("Usuário seguido com sucesso")
     
@@ -173,7 +177,31 @@ app.post('/user/follow/:id', async (req: express.Request, res: express.Response)
     }
 })
 
-    app.get("/recipe/:id", async (req: Request, res: Response) => {
+app.post('/user/unfollow/:id', async (req: express.Request, res: express.Response) => {
+    try {
+        const token= req.headers.authorization as string;
+
+        const authenticator = new Authenticator();
+        const authenticationData = authenticator.getData(token);
+
+        if (!req.params.id || req.params.id === "") {
+            throw new Error("Usuário inválido / Campo vazio.")
+
+        }
+               
+        const userDataBase = new UserDatabase();
+        userDataBase.unfollow(authenticationData.id, req.params.id);
+
+        res.status(200).send("Você deixou de seguir o perfil")
+    
+    } catch (error) {
+        res.status(400).send({
+            message: error.message
+        })
+    }
+})
+
+app.get("/recipe/:id", async (req: Request, res: Response) => {
         try {
             const token = req.headers.authorization as string;
             const authenticator = new Authenticator();
@@ -193,7 +221,7 @@ app.post('/user/follow/:id', async (req: express.Request, res: express.Response)
                 message: err.message,
             });
         }
-    });
+});
 
 
 const server = app.listen(process.env.PORT || 3003, () => {

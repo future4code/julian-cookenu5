@@ -5,7 +5,7 @@ export class UserDatabase extends BaseDatabase {
   private static TABLE_NAME = "Cookenu_User"; 
   private static TABLE_FOLLOW = "Cookenu_Follow";
   
-  async createUser(
+  async create(
     id: string,      
     name: string,
     email: string,
@@ -42,7 +42,7 @@ export class UserDatabase extends BaseDatabase {
     }
   }
 
-  public async getUserById(id: string): Promise<any> {
+  public async getById(id: string): Promise<any> {
     const result = await this.getConnection()
       .select("*")
       .from(UserDatabase.TABLE_NAME)
@@ -50,7 +50,7 @@ export class UserDatabase extends BaseDatabase {
       return result[0];
   } 
 
-  async insertFollowedUserId (id_User: string, userToFollowId: string): Promise<any>{
+  async follow (id_User: string, userToFollowId: string): Promise<any>{
     try {
       await this.getConnection()
       .insert({
@@ -59,6 +59,17 @@ export class UserDatabase extends BaseDatabase {
       })
       .into(UserDatabase.TABLE_FOLLOW)
    
+    } catch (err) {
+      throw new Error(err.sqlMessage || err.message)
+    }
+  }
+
+  async unfollow (id_User: string, userToFollowId: string): Promise<any>{
+    try {
+      const result = await this.getConnection().raw (`
+      DELETE FROM ${UserDatabase.TABLE_FOLLOW} 
+      WHERE userToFollowId = ${userToFollowId} AND id_user= ${id_User}
+    `)
     } catch (err) {
       throw new Error(err.sqlMessage || err.message)
     }
