@@ -50,18 +50,22 @@ export class UserDatabase extends BaseDatabase {
       return result[0];
   } 
 
-  async insertUserIdThatIFollow (id: string): Promise<any>{
+  async insertFollowedUserId (id_User: string, userToFollowId: string): Promise<any>{
     try {
       await this.getConnection()
-        .insert("")
-        .from(UserDatabase.TABLE_NAME)
-        .where({id});
-          
+      .insert({
+        id_User,
+        userToFollowId
+      })
+      .into(UserDatabase.TABLE_FOLLOW)
+   
     } catch (err) {
       throw new Error(err.sqlMessage || err.message)
     }
   }
 }
+
+
 
 
 

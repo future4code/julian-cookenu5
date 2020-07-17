@@ -56,6 +56,41 @@ app.post('/signup', async (req: express.Request, res: express.Response) => {
     }
 })
 
+app.post("/login", async (req: express.Request, res: express.Response) => {
+    try{
+      const userData = 
+      {
+        email: req.body.email,
+        password: req.body.password
+      }
+
+      const userDatabase = new UserDatabase();
+      const user = await userDatabase.getByEmail(userData.email); 
+
+      const hashManager = new HashManager()
+      const comparePassword = await hashManager.compare(userData.password, user.password)
+
+      if(user.email !== userData.email){
+        throw new Error("E-mail inválido.");
+      }
+
+      if(comparePassword === false){
+        throw new Error("Senha inválida.");
+      }
+
+      const authenticator = new Authenticator();
+      const token = authenticator.generateToken({id: user.id});
+
+      res.status(200).send({token});
+
+    } catch (err) {
+        res.status(400).send({
+            message: err.message,
+        });
+    }
+
+  });
+
 app.get("/user/profile", async (req: Request, res: Response) => {
     try {
         const token = req.headers.authorization as string;
@@ -103,8 +138,33 @@ app.post('/recipe', async (req: express.Request, res: express.Response) => {
         const id = idGenerator.generate();
 
         const RecipeDB = new RecipeDatabase();
-        const recipe = await RecipeDB.createRecipe(id, RecipeData.title, RecipeData.description, authenticationData.id, new Date())
+        const recipe = await RecipeDB.createRecipe(
+            id, 
+            RecipeData.title, 
+            RecipeData.description, 
+            authenticationData.id, 
+            new Date())
+
         res.status(200).send("Receita publicada!")
+    } catch (error) {
+        res.status(400).send({
+            message: error.message
+        })
+    }
+})
+
+app.post('/user/follow/:id', async (req: express.Request, res: express.Response) => {
+    try {
+        const token= req.headers.authorization as string;
+
+        const authenticator = new Authenticator();
+        const authenticationData = authenticator.getData(token);
+        
+        const userDataBase = new UserDatabase();
+        const follow = await userDataBase.insertFollowedUserId(authenticationData.id, req.params.id);
+
+        res.status(200).send("Usuário seguido com sucesso")
+    
     } catch (error) {
         res.status(400).send({
             message: error.message
