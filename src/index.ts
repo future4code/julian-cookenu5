@@ -41,7 +41,7 @@ app.post('/signup', async (req: express.Request, res: express.Response) => {
         const id = idGenerator.generate();
 
         const userDB = new UserDatabase();
-        const user = await userDB.create(id, userData.name, userData.email, cipherText)
+        const user = await userDB.create (id, userData.name, userData.email, cipherText)
 
         const authenticator = new Authenticator();
         const token = authenticator.generateToken({
@@ -153,20 +153,15 @@ app.post('/recipe', async (req: express.Request, res: express.Response) => {
     }
 })
 
-
 app.post('/user/follow/:id', async (req: express.Request, res: express.Response) => {
     try {
         const token= req.headers.authorization as string;
 
         const authenticator = new Authenticator();
         const authenticationData = authenticator.getData(token);
-
-        if (!req.params.id || req.params.id === "") {
-            throw new Error("Usuário inválido / Campo vazio.")
-        }
         
         const userDataBase = new UserDatabase();
-        await userDataBase.follow(authenticationData.id, req.params.id);
+        const follow = await userDataBase.follow(authenticationData.id, req.params.id);
 
         res.status(200).send("Usuário seguido com sucesso")
     
@@ -186,7 +181,6 @@ app.post('/user/unfollow/:id', async (req: express.Request, res: express.Respons
 
         if (!req.params.id || req.params.id === "") {
             throw new Error("Usuário inválido / Campo vazio.")
-
         }
                
         const userDataBase = new UserDatabase();
@@ -202,47 +196,47 @@ app.post('/user/unfollow/:id', async (req: express.Request, res: express.Respons
 })
 
 app.get("/recipe/:id", async (req: Request, res: Response) => {
-        try {
-            const token = req.headers.authorization as string;
-            const authenticator = new Authenticator();
-            const authenticationData = authenticator.getData(token);
+    try {
+        const token = req.headers.authorization as string;
+        const authenticator = new Authenticator();
+        const authenticationData = authenticator.getData(token);
 
-            const recipeDb = new RecipeDatabase();
-            const recipe = await recipeDb.getRecipeById(req.params.id);
+        const recipeDb = new RecipeDatabase();
+        const recipe = await recipeDb.getRecipeById(req.params.id);
 
-            res.status(200).send({
-                id: recipe.id,
-                title: recipe.title,
-                description: recipe.description,
-                createdAt: recipe.createdAt
-            });
-        } catch (err) {
-            res.status(400).send({
-                message: err.message,
-            });
-        }
+        res.status(200).send({
+            id: recipe.id,
+            title: recipe.title,
+            description: recipe.description,
+            createdAt: recipe.createdAt
+        });
+    } catch (err) {
+        res.status(400).send({
+            message: err.message,
+        });
+    }
 });
 
-    app.get("/feed", async (req: Request, res: Response) => {
-        try {
-            const token = req.headers.authorization as string;
-            const authenticator = new Authenticator();
-            const authenticationData = authenticator.getData(token);
+app.get("/feed", async (req: Request, res: Response) => {
+    try {
+        const token = req.headers.authorization as string;
+        const authenticator = new Authenticator();
+        const authenticationData = authenticator.getData(token);
 
-            const recipeDb = new RecipeDatabase();
-            const recipe = await recipeDb.getFeed(authenticationData.id);
+        const recipeDb = new RecipeDatabase();
+        const recipe = await recipeDb.getFeed(authenticationData.id);
 
-            let feed = recipe.map((item: any)=>{
-                return item
-            })
+         let feed = recipe.map((item: any)=>{
+            return item
+        })
 
-            res.status(200).send({recipe});
-        } catch (err) {
-            res.status(400).send({
-                message: err.message,
-            });
-        }
-    });
+        res.status(200).send({recipe});
+    } catch (err) {
+        res.status(400).send({
+            message: err.message,
+        });
+    }
+});
 
 const server = app.listen(process.env.PORT || 3003, () => {
     if (server) {

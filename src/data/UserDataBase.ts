@@ -68,7 +68,7 @@ export class UserDatabase extends BaseDatabase {
     try {
       const result = await this.getConnection().raw (`
       DELETE FROM ${UserDatabase.TABLE_FOLLOW} 
-      WHERE userToFollowId = ${userToFollowId} AND id_user= ${id_User}
+      WHERE userToFollowId = "${userToFollowId}" AND id_user= "${id_User}"
     `)
     } catch (err) {
       throw new Error(err.sqlMessage || err.message)
