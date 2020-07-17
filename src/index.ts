@@ -195,6 +195,26 @@ app.post('/user/follow/:id', async (req: express.Request, res: express.Response)
         }
     });
 
+    app.get("/feed", async (req: Request, res: Response) => {
+        try {
+            const token = req.headers.authorization as string;
+            const authenticator = new Authenticator();
+            const authenticationData = authenticator.getData(token);
+
+            const recipeDb = new RecipeDatabase();
+            const recipe = await recipeDb.getFeed(authenticationData.id);
+
+            let feed = recipe.map((item: any)=>{
+                return item
+            })
+
+            res.status(200).send({recipe});
+        } catch (err) {
+            res.status(400).send({
+                message: err.message,
+            });
+        }
+    });
 
 const server = app.listen(process.env.PORT || 3003, () => {
     if (server) {
