@@ -30,4 +30,12 @@ export class RecipeDatabase extends BaseDatabase {
       }
     }
 
+    public async getRecipeById(id: string): Promise<any> {
+      const result = await this.getConnection()
+        .select("*")
+        .from(RecipeDatabase.TABLE_NAME)
+        .where({ id });
+        return result[0];
+    } 
+
 }
